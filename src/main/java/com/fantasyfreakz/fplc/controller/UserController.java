@@ -1,11 +1,16 @@
 package com.fantasyfreakz.fplc.controller;
 
+import com.fantasyfreakz.fplc.domain.entites.UserCredential;
 import com.fantasyfreakz.fplc.domain.entites.UserInfo;
-import com.fantasyfreakz.fplc.domain.model.UserDTO;
-import com.fantasyfreakz.fplc.domain.model.UserLoginDTO;
+import com.fantasyfreakz.fplc.domain.model.request.UserInfoDTO;
+import com.fantasyfreakz.fplc.domain.model.request.UserInfoWithCredentialDTO;
+import com.fantasyfreakz.fplc.domain.model.response.UserInfoResponseDTO;
+import com.fantasyfreakz.fplc.domain.model.request.UserCredentialDTO;
 import com.fantasyfreakz.fplc.service.JwtService;
 import com.fantasyfreakz.fplc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -25,16 +31,15 @@ public class UserController {
     @Autowired
     private JwtService jwtService;
 
-    @GetMapping("/user")
-    public String hello(@RequestParam String name) {
-        UserDTO dto = userService.getUserByName(name);
+    //Get single user information
+    @GetMapping("/getUser/{userName}")
+    public UserInfoResponseDTO getUser(@PathVariable String userName) {
+        UserInfoResponseDTO dto = userService.getUserByName(userName);
 
         if(dto != null){
-            return dto.toString();
+            return dto;
         }
-
-//        return ResponseEntity.ok().body(dto.getDesignation()).toString();
-        return "Hello";
+        return null;
     }
 
     @GetMapping("/getAllUsers")
@@ -42,8 +47,29 @@ public class UserController {
         return userService.getAllUser();
     }
 
+    @PostMapping("/createUser")
+    public ResponseEntity<Void> createUser(@RequestBody UserInfoWithCredentialDTO userInfoWithCredentialDTO){
+        userService.createUserWithCredentialsAndInfo(userInfoWithCredentialDTO);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/updateUserInfo")
+    public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfoDTO userInfoDTO){
+        return ResponseEntity.ok(userService.updateUserInfo(userInfoDTO));
+    }
+
+    @PutMapping("/updatePassword")
+    public ResponseEntity<UserCredential> updatePassword(@RequestBody UserCredentialDTO userCredentialDTO){
+        UserCredential userCredential = userService.updatePassword(userCredentialDTO);
+
+        return ResponseEntity.ok(userCredential);
+    }
+
+
+
     @PostMapping("/login")
-    public String login(@RequestBody UserLoginDTO user){
+    public String login(@RequestBody UserCredentialDTO user){
 
         try {
 

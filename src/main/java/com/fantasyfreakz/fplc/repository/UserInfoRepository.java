@@ -1,5 +1,6 @@
 package com.fantasyfreakz.fplc.repository;
 
+import com.fantasyfreakz.fplc.domain.entites.UserCredential;
 import com.fantasyfreakz.fplc.domain.entites.UserInfo;
 import jakarta.persistence.Id;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,6 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Id> {
 
     @Override
     Optional<UserInfo> findById(Id id);
+
+    UserInfo findByUserCredentialUsername(String username);
 }
